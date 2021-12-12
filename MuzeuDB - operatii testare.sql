@@ -20,6 +20,9 @@ GO
 CREATE FUNCTION uf_GenerateString(@len TINYINT)
 RETURNS VARCHAR(255) AS
 BEGIN
+	IF @len = 0
+		RETURN ''
+
 	DECLARE @str VARCHAR(255) = ''
 
 	DECLARE @cont TINYINT = 0
@@ -213,6 +216,9 @@ GO
 CREATE PROCEDURE usp_InsertIntoGhizi(@numberOfRows SMALLINT)
 AS
 BEGIN
+	IF @numberOfRows <= 0
+		THROW 50002, '[X]Numar invalid de inregistrari!', 1
+
 	DECLARE @cont SMALLINT
 	SET @cont = 1
 
@@ -262,6 +268,9 @@ GO
 CREATE PROCEDURE usp_InsertIntoFosileDinozauri(@numberOfRows SMALLINT)
 AS
 BEGIN
+	IF @numberOfRows <= 0
+		THROW 50002, '[X]Numar invalid de inregistrari!', 1
+
 	DECLARE @cont SMALLINT
 	SET @cont = 1
 
@@ -344,6 +353,9 @@ GO
 CREATE PROCEDURE usp_InsertIntoVizitatoriGhizi(@numberOfRows SMALLINT)
 AS
 BEGIN
+	IF @numberOfRows <= 0
+		THROW 50002, '[X]Numar invalid de inregistrari!', 1
+
 	DECLARE @cont SMALLINT
 	SET @cont = 1
 
@@ -390,6 +402,9 @@ GO
 CREATE PROCEDURE usp_InsertIntoTables(@numberOfRows SMALLINT)
 AS
 BEGIN
+	IF @numberOfRows <= 0
+		THROW 50002, '[X]Numar invalid de inregistrari!', 1
+
 	EXEC usp_InsertIntoGhizi @numberOfRows
 	EXEC usp_InsertIntoFosileDinozauri @numberOfRows
 	EXEC usp_InsertIntoVizitatoriGhizi @numberOfRows
@@ -400,5 +415,5 @@ END
 GO
 
 --EXEC usp_DeleteFromTables
---EXEC usp_SelectFromViews
 --EXEC usp_InsertIntoTables 1000
+--EXEC usp_SelectFromViews

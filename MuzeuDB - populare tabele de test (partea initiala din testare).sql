@@ -1,6 +1,12 @@
 USE MuzeuDB
 GO
 
+DELETE FROM [dbo].[TestViews]
+DELETE FROM [dbo].[TestTables]
+DELETE FROM [dbo].[Views]
+DELETE FROM [dbo].[Tables]
+DELETE FROM [dbo].[Tests]
+
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'usp_PopulateTables')
 	DROP PROCEDURE usp_PopulateTables
 
@@ -139,10 +145,35 @@ AS
 BEGIN
 	DELETE FROM [TestViews]
 	
+	DECLARE @idTestView INT
+	SELECT @idTestView = MAX([dbo].[Tests].[TestID]) FROM Tests
+
+	DECLARE @idViewMin INT
+	SET @idViewMin = (SELECT MIN(ViewID) FROM [dbo].[Views])
+
+	DECLARE @idViewMax INT
+	SET @idViewMax = (SELECT MAX(ViewID) FROM [dbo].[Views])
+
+	WHILE @idViewMin <= @idViewMax
+	BEGIN
+		IF (SELECT COUNT(*) FROM [dbo].[Views] WHERE ViewID = @idViewMin) = 0
+		BEGIN
+			SET @idViewMin = @idViewMin + 1
+			CONTINUE
+		END
+
+		INSERT INTO [TestViews] VALUES
+		(@idTestView, @idViewMin)
+
+		SET @idViewMin = @idViewMin + 1
+	END
+
+	/*
 	INSERT INTO [TestViews] VALUES
-	(5, 1),
-	(5, 2),
-	(5, 3)
+	(@idTestView, @idViewMin + 0),
+	(@idTestView, @idViewMin + 1),
+	(@idTestView, @idViewMin + 2)
+	*/
 END
 
 --------------------------
@@ -162,25 +193,29 @@ CREATE PROCEDURE usp_PopulateTestTables
 AS
 BEGIN
 	DELETE FROM TestTables
+
+	DECLARE @idTestMin INT = (SELECT MIN(TestID) FROM [dbo].[Tests])
+
+	DECLARE @idTableMin INT = (SELECT MIN(TableID) FROM [dbo].[Tables])
 	
 	INSERT INTO TestTables VALUES
-	(1, 1, NULL, 3), -- testul 1 (de stergere/delete) cu tabelul 1 (tabelul/tabela Ghizi cu PK si FK)
-	(1, 2, NULL, 2), -- testul 1 (de stergere/delete) cu tabelul 2 (tabelul/tabela FosileDinozauri cu PK si fara FK)
-	(1, 3, NULL, 1)  -- testul 1 (de stergere/delete) cu tabelul 3 (tabelul/tabela de legatura (intermediara) VizitatoriGhizi cu doua PK)
+	(@idTestMin + 0, @idTableMin + 0, NULL, 3), -- testul 1 (de stergere/delete) cu tabelul 1 (tabelul/tabela Ghizi cu PK si FK)
+	(@idTestMin + 0, @idTableMin + 1, NULL, 2), -- testul 1 (de stergere/delete) cu tabelul 2 (tabelul/tabela FosileDinozauri cu PK si fara FK)
+	(@idTestMin + 0, @idTableMin + 2, NULL, 1); -- testul 1 (de stergere/delete) cu tabelul 3 (tabelul/tabela de legatura (intermediara) VizitatoriGhizi cu doua PK)
 
 	INSERT INTO TestTables(TestID, TableID, NoOfRows, Position) VALUES
 	-- Pentru testul 2 (de inserare)
-	(2, 1, 100, 3),  -- testul 2 (de inserare/adaugare  100 de inregistrari/date/linii) in tabelul/tabela 1 (Ghizi)
-	(2, 2, 100, 2),  -- testul 2 (de inserare/adaugare  100 de inregistrari/date/linii) in tabelul/tabela 2 (FosileDinozauri)
-	(2, 3, 100, 1),  -- testul 2 (de inserare/adaugare  100 de inregistrari/date/linii) in tabelul/tabela 3 (VizitatoriGhizi)
+	(@idTestMin + 1, @idTableMin + 0, 100, 3),  -- testul 2 (de inserare/adaugare  100 de inregistrari/date/linii) in tabelul/tabela 1 (Ghizi)
+	(@idTestMin + 1, @idTableMin + 1, 100, 2),  -- testul 2 (de inserare/adaugare  100 de inregistrari/date/linii) in tabelul/tabela 2 (FosileDinozauri)
+	(@idTestMin + 1, @idTableMin + 2, 100, 1),  -- testul 2 (de inserare/adaugare  100 de inregistrari/date/linii) in tabelul/tabela 3 (VizitatoriGhizi)
 	-- Pentru testul 3 (de inserare)
-	(3, 1, 500, 3),  -- testul 3 (de inserare/adaugare  500 de inregistrari/date/linii) in tabelul/tabela 1 (Ghizi)
-	(3, 2, 500, 2),  -- testul 3 (de inserare/adaugare  500 de inregistrari/date/linii) in tabelul/tabela 2 (FosileDinozauri)
-	(3, 3, 500, 1),  -- testul 3 (de inserare/adaugare  500 de inregistrari/date/linii) in tabelul/tabela 3 (VizitatoriGhizi)
+	(@idTestMin + 2, @idTableMin + 0, 500, 3),  -- testul 3 (de inserare/adaugare  500 de inregistrari/date/linii) in tabelul/tabela 1 (Ghizi)
+	(@idTestMin + 2, @idTableMin + 1, 500, 2),  -- testul 3 (de inserare/adaugare  500 de inregistrari/date/linii) in tabelul/tabela 2 (FosileDinozauri)
+	(@idTestMin + 2, @idTableMin + 2, 500, 1),  -- testul 3 (de inserare/adaugare  500 de inregistrari/date/linii) in tabelul/tabela 3 (VizitatoriGhizi)
 	-- Pentru testul 4 (de inserare)
-	(4, 1, 1000, 3), -- testul 4 (de inserare/adaugare 1000 de inregistrari/date/linii) in tabelul/tabela 1 (Ghizi)
-	(4, 2, 1000, 2), -- testul 4 (de inserare/adaugare 1000 de inregistrari/date/linii) in tabelul/tabela 2 (FosileDinozauri)
-	(4, 3, 1000, 1)  -- testul 4 (de inserare/adaugare 1000 de inregistrari/date/linii) in tabelul/tabela 3 (VizitatoriGhizi)
+	(@idTestMin + 3, @idTableMin + 0, 1000, 3), -- testul 4 (de inserare/adaugare 1000 de inregistrari/date/linii) in tabelul/tabela 1 (Ghizi)
+	(@idTestMin + 3, @idTableMin + 1, 1000, 2), -- testul 4 (de inserare/adaugare 1000 de inregistrari/date/linii) in tabelul/tabela 2 (FosileDinozauri)
+	(@idTestMin + 3, @idTableMin + 2, 1000, 1); -- testul 4 (de inserare/adaugare 1000 de inregistrari/date/linii) in tabelul/tabela 3 (VizitatoriGhizi)
 END
 
 ---------------------------

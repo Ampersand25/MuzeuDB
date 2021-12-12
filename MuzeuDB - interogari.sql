@@ -6,6 +6,24 @@ GO
 
 
 
+/*
+DELETE FROM [dbo].[VizitatoriGhizi]
+DELETE FROM [dbo].[StanduriDinozauri]
+DELETE FROM [dbo].[FosileDinozauri]
+DELETE FROM [dbo].[Ghizi]
+DELETE FROM [dbo].[VizitatoriVase]
+DELETE FROM [dbo].[Vase]
+DELETE FROM [dbo].[Vitrine]
+DELETE FROM [dbo].[VizitatoriBijuterii]
+DELETE FROM [dbo].[Vizitatori]
+DELETE FROM [dbo].[Bijuterii]
+DELETE FROM [dbo].[Paznici]
+*/
+
+
+
+
+
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- PARTEA DE INSERARI IN TABELE
 ------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -34,6 +34,18 @@ GO
 CREATE PROCEDURE usp_SelectFromGivenView(@nameView NVARCHAR(50))
 AS
 BEGIN
+	IF @nameView = ''
+		THROW 50002, '[X]Nume de view invalid!', 1
+
+	IF (SELECT COUNT(*) FROM [sys].[views] AS V WHERE V.name = @nameView) = 0
+		THROW 50003, '[X]Nu exista niciun view cu numele dat!', 1
+
+	DECLARE @querySelectFromView NVARCHAR(MAX)
+	SET @querySelectFromView = 'SELECT * FROM [dbo].[' + @nameView + ']'
+
+	EXEC sp_executesql @querySelectFromView
+
+	/*
 	IF @nameView = 'vw_Ghizi'
 		EXEC usp_SelectFromViewGhizi
 	ELSE IF @nameView = 'vw_FosileDinozauri'
@@ -41,7 +53,8 @@ BEGIN
 	ELSE IF @nameView = 'vw_VizitatoriGhizi'
 		EXEC usp_SelectFromViewVizitatoriGhizi
 	ELSE
-		THROW 50002, '[X]Nume view invalid', 1
+		THROW 50003, '[X]Nu exista niciun view cu numele dat!', 1
+	*/
 END
 
 GO
@@ -54,6 +67,18 @@ GO
 CREATE PROCEDURE usp_DeleteFromGivenTable(@nameTable NVARCHAR(50))
 AS
 BEGIN
+	IF @nameTable = ''
+		THROW 50002, '[X]Nume de tabel invalid!', 1
+
+	IF (SELECT COUNT(*) FROM [sys].[tables] WHERE sys.tables.name = @nameTable) = 0
+		THROW 50003, '[X]Nu exista niciun tabel cu numele dat!', 1
+
+	DECLARE @queryDeleteFromTable NVARCHAR(MAX)
+	SET @queryDeleteFromTable = 'DELETE FROM [dbo].[' + @nameTable + ']'
+
+	EXEC sp_executesql @queryDeleteFromTable
+	
+	/*
 	IF @nameTable = 'Ghizi'
 		--DELETE FROM [dbo].[Ghizi]
 		EXEC usp_DeleteFromGhizi
@@ -64,7 +89,8 @@ BEGIN
 		--DELETE FROM [dbo].[VizitatoriGhizi]
 		EXEC usp_DeleteFromVizitatoriGhizi
 	ELSE
-		THROW 50002, '[X]Nume tabel invalid', 1
+		THROW 50003, '[X]Nu exista niciun tabel cu numele dat!', 1
+	*/
 END
 
 GO
@@ -77,6 +103,17 @@ GO
 CREATE PROCEDURE usp_InsertIntoGivenTable(@nameTable NVARCHAR(50), @noOfRows SMALLINT)
 AS
 BEGIN
+	DECLARE @err VARCHAR(50) = ''
+	
+	IF @nameTable = ''
+		SET @err = '[X]Nume de tabel invalid!' + CHAR(13)
+	
+	IF @noOfRows <= 0
+		SET @err = @err + '[X]Numar de inregistrari invalid!' + CHAR(13)
+
+	IF LEN(@err) <> 0
+		THROW 50002, @err, 1
+
 	IF @nameTable = 'Ghizi'
 		EXEC usp_InsertIntoGhizi @noOfRows
 	ELSE IF @nameTable = 'FosileDinozauri'
@@ -84,7 +121,7 @@ BEGIN
 	ELSE IF @nameTable = 'VizitatoriGhizi'
 		EXEC usp_InsertIntoVizitatoriGhizi @noOfRows
 	ELSE
-		THROW 50002, '[X]Nume tabel invalid', 1
+		THROW 50003, '[X]Nu exista niciun tabel cu numele dat!', 1
 END
 
 GO
@@ -266,3 +303,17 @@ GO
 --EXEC usp_ExecuteOneTest 3 -- insert 500
 --EXEC usp_ExecuteOneTest 4 -- insert 1000
 --EXEC usp_ExecuteOneTest 5 -- view
+
+/*
+DECLARE @deleteTestID INT = (SELECT MIN(TestID) FROM Tests)
+DECLARE @insert100TestID INT = @deleteTestID + 1
+DECLARE @insert500TestID INT = @insert100TestID + 1
+DECLARE @insert1000TestID INT = @insert500TestID + 1
+DECLARE @viewTestID INT = (SELECT MAX(TestID) FROM Tests)
+
+--EXEC usp_ExecuteOneTest @deleteTestID     -- delete
+--EXEC usp_ExecuteOneTest @insert100TestID  -- insert 100
+--EXEC usp_ExecuteOneTest @insert500TestID  -- insert 500
+--EXEC usp_ExecuteOneTest @insert1000TestID -- insert 1000
+--EXEC usp_ExecuteOneTest @viewTestID       -- view
+*/
