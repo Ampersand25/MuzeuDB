@@ -9,9 +9,6 @@ BEGIN
 
     IF (@culoare IS NULL OR @culoare = '')
         SET @retval = 0
-	
-	IF (@culoare LIKE '%[^a-zA-Z -]%')
-        SET @retval = 0
 
 	RETURN @retval
 END
@@ -108,7 +105,7 @@ BEGIN
 	FROM [MuzeuDB].[dbo].[Vase]
 	SET @vasID = @vasID + 1
 	
-	INSERT INTO Vase(VasID, Culoare, Material, Vechime, VitrinaID) VALUES
+	INSERT INTO [MuzeuDB].[dbo].[Vase] (VasID, Culoare, Material, Vechime, VitrinaID) VALUES
 	(@vasID, @culoare, @material, @vechime, @vitrinaID)
 END
 
@@ -187,7 +184,7 @@ AS
 BEGIN
 	EXEC sp_ValidareVizitator @nume, @prenume, @varsta
 	
-	INSERT INTO Vizitatori(Prenume, Nume, Varsta) VALUES
+	INSERT INTO [MuzeuDB].[dbo].[Vizitatori] (Prenume, Nume, Varsta) VALUES
 	(@prenume, @nume, @varsta)
 END
 
@@ -205,7 +202,7 @@ BEGIN
 	SELECT @vasID = MAX(VasID)
 	FROM [MuzeuDB].[dbo].[Vase]
 
-	INSERT INTO VizitatoriVase(NrLegitimatie, VasID) VALUES
+	INSERT INTO [MuzeuDB].[dbo].[VizitatoriVase] (NrLegitimatie, VasID) VALUES
 	(@nrLegitimatie, @vasID)
 END
 
