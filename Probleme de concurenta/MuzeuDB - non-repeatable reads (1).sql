@@ -1,0 +1,16 @@
+USE MuzeuDB
+GO
+
+CREATE OR ALTER PROCEDURE dbo.NonRepeatableReads1
+AS
+BEGIN
+	INSERT INTO [MuzeuDB].[dbo].[Vase] VALUES (200, 'Ticlam', 'Argila', 1234, 7)
+	BEGIN TRAN -- BEGIN TRANSATION
+	WAITFOR DELAY '00:00:05'
+	UPDATE [MuzeuDB].[dbo].[Vase] SET Vechime = 5678 WHERE VasID = 200
+	COMMIT TRAN -- COMMIT TRANSATION
+END
+
+GO
+
+EXEC dbo.NonRepeatableReads1
